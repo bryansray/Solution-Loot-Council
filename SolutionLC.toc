@@ -1,0 +1,15 @@
+## Author: Virtualize (virtual#1157)
+## Interface: 60003
+## Notes: Interface for running an efficient Loot Council.
+## SavedVariables: SolutionLCDB
+## Title: Solution LC
+## Version: 0.1
+
+embeds.xml
+MainFrame.xml
+LootFrame.xml
+RankFrame.xml
+VersionFrame.xml
+LootHistory.xml
+options.lua
+ArmorTokenData.lua
