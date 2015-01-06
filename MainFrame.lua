@@ -197,10 +197,11 @@ function SolutionLC:OnEnable()
 			tinsert(lootTable, item) -- add the item link to the table
 			tinsert(itemsToLootIndex, lootCount + 1) -- add its index to the lootTable
 			
-			-- SolutionLC_Mainframe.Update(true)
-			
-			SolutionLC_LootFrame:AddItem(lootTable, item)
-			-- SolutionLC_LootFrame:Update(lootTable) -- setup our own loot frames
+			SolutionLC_LootFrame:AddItem(lootTable, item);
+
+			local message = { ["lootTable"] = lootTable, ["item"] = item };
+			self:SendCommMessage("SolutionLC", "addItem " .. self:Serialize(message), channel) -- tell everyone to do the same
+
 			SolutionLC_Mainframe.prepareLootFrame(item)	
 		end
 		
@@ -503,6 +504,22 @@ function SolutionLC:OnCommReceived(prefix, msg, distri, sender)
 				SolutionLC_Mainframe:ChangeSession(lootNum) -- just call ChangeSession as it's basicly the same
 			else
 				self:debug("A non ML called for a start!")
+			end
+		elseif cmd == "addItem" then
+			if not isMasterLooter or nnp then
+				local test, c = self:Deserialize(object);
+				
+				lootTable = c["lootTable"];
+				local name = GetItemInfo(c["item"]);
+				
+				SolutionLC_LootFrame:AddItem(lootTable, c["item"]);
+				SolutionLC_Mainframe:ChangeSession(lootNum) -- just call ChangeSession as it's basicly the same
+				
+				for i = 1, #lootTable do
+					local name = GetItemInfo(lootTable[i]);
+					
+					print(name);
+				end
 			end
 		elseif cmd == "lootTable" then
 			if not isMasterLooter or nnp then
