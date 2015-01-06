@@ -79,6 +79,87 @@ function SolutionLC_LootFrame:CreateFrame(id)
 	return frame;
 end
 
+function SolutionLC_LootFrame:AddItem(lootTable, item)
+	local i = table.getn(lootTable)
+	local index = 1;
+
+	tinsert(itemsLooting, { item = item, position = i });
+	
+	local name, link, _, ilvl, _, _, _, _, _, texture = GetItemInfo(item)
+	local frame = lootFrames[i];
+	
+	if not frame then
+		frame = SolutionLC_LootFrame:CreateFrame(i);
+		lootFrames[i] = frame;
+	end
+	
+	frame.item = item
+	frame.id = i;
+	frame.index = index;
+	
+	for j = 1, db.numButtons do
+		local button = frame.buttons[j]
+		if not button then -- create it
+			button = CreateFrame("button", "$parentButton"..j, frame, "RCLootFrame_Button")
+			button:SetID(j)				
+			if j == 1 then -- first needs specific anchor
+				button:SetPoint("BOTTOMLEFT", 65, 10)				
+			else
+				button:SetPoint("TOPLEFT", "$parentButton"..(j-1), "TOPRIGHT", 5, 0)				
+			end	
+			button:Show()
+			frame.buttons[j] = button				
+		end
+		-- Always update the text in case of changes
+		local length = #(buttonsDB[j]["text"]) * 10 - 20; -- calculate length
+		if length < 66 then length = 66 end -- minimun is 66px
+		button:SetText(buttonsDB[j]["text"])
+		button:SetWidth(length)
+
+		-- Frame and mouseover width
+		local count = 18
+		if strlen(name) > count then
+			count = strlen(name)
+		end
+		local lootFrameWidth = 155
+		local hoverWidth = count * 10 - 40
+
+		-- Get the width of each button
+		for k, but in pairs(frame.buttons) do
+			if k > db.numButtons then break; end -- don't get it too wide
+			lootFrameWidth = lootFrameWidth + but:GetWidth()
+		end
+
+		-- make sure the width doesn't get less than the length of the item
+		if lootFrameWidth - 50 < hoverWidth then lootFrameWidth = hoverWidth + 50; end 
+		RCLootFrame:SetWidth(lootFrameWidth)
+
+		frame:SetWidth(lootFrameWidth)
+		getglobal("RCLootFrameEntry"..i.."Hover2"):SetWidth(hoverWidth)
+		getglobal("RCLootFrameEntry"..i.."ItemLabel"):SetText(link);
+		getglobal("RCLootFrameEntry"..i.."ItemLabel"):SetFont("Fonts\\FRIZQT__.TTF", 16);
+		getglobal("RCLootFrameEntry"..i.."Texture"):SetTexture(texture);
+		getglobal("RCLootFrameEntry"..i.."Ilvl"):SetText("ilvl: "..ilvl);
+		getglobal("RCLootFrameEntry"..i.."Ilvl"):SetPoint("TOPRIGHT", "$parent", "TOPRIGHT", -2, -5)
+		RCLootFrame:SetHeight(i * 75)
+		RCLootFrame:SetWidth(lootFrameWidth)
+		frame:Show();
+		lootFrames[i] = frame
+	end
+	for j = db.numButtons+1, #frame.buttons do -- throw away not used buttons
+		if frame.buttons[j] then
+			frame.buttons[j]:Hide()
+			frame.buttons[j]:SetParent(nil)
+		end
+	end
+	-- Anchor the frames correctly
+	if i > 1 then
+		lootFrames[i]:SetPoint("TOPLEFT", lootFrames[i-1], "BOTTOMLEFT")
+	end
+	
+	RCLootFrame:Show()
+end
+
 function SolutionLC_LootFrame:Update(lootTable, newRollRequest)
 	-- only edit the lootTable when we recieve it from the ML
 	-- and actually create a new table, not just reference
@@ -220,7 +301,8 @@ end
 function SolutionLC_LootFrame:onClick(response, frame, button)
 	SolutionLC:debugS("LootFrame:onClick("..tostring(response)..", frame, button)")
 	SolutionLC.handleResponse(response, frame);	
-	tremove(itemsLooting, frame:GetID())
+	local position = frame.index or frame:GetID();
+	tremove(itemsLooting, position);
 	SolutionLC_LootFrame:Update()
 end
 

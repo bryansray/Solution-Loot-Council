@@ -582,7 +582,7 @@ function addon:OptionsTable()
 								name = "Open the Loot History",
 								desc = "Click to open the SolutionLC Loot History.",
 								type = "execute",
-								func = function() SolutionLC:EnableModule("RCLootHistory");	InterfaceOptionsFrame:Hide();end,
+								func = function() SolutionLC:EnableModule("LootHistory");	InterfaceOptionsFrame:Hide();end,
 							},
 							clearLootDB = {
 								order = 90,

@@ -14,7 +14,7 @@ local version = GetAddOnMetadata("SolutionLC", "Version")
 local isMasterLooter = false; -- is the player master looter?
 local isCouncil = false; -- is the player in the council?
 local isRunning = false; -- should we use the addon?
-local isTesting = true; -- are we testing?
+local isTesting = false; -- are we testing?
 local masterLooter = ""; -- name of master looter
 local currentCouncil = {} -- The current council of the session
 local itemRunning = nil; -- the item in the current session
@@ -31,6 +31,7 @@ local currentSession = 1; -- the session the user is currently viewing
 local itemsLoaded = true; -- used to test if any item is awaiting info
 local hasItemInfo = false -- prevent spamming loot frames from GET_ITEM_INFO_RECEIVED
 local channel = "RAID" -- the channel to use for comms, "RAID" normally, "PARTY" for debugging with starter accounts
+local awardLootAsync = true;
 
 local MAX_DISPLAY = 11 -- max people to display in council voting window
 local MAX_ITEMS = 20 -- max items allowed to be rolled at once (TODO make dynamic)
@@ -183,7 +184,28 @@ function SolutionLC:OnEnable()
 	MainFrame:RegisterEvent("CHAT_MSG_RAID");
 	MainFrame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 	MainFrame:RegisterEvent("RAID_INSTANCE_WELCOME");
+	MainFrame:RegisterEvent("OnReceiveDrag");
 	MainFrame:SetScript("OnEvent", SolutionLC.EventHandler);
+	MainFrame:SetScript("OnReceiveDrag", function(frame)
+		local infoType, info1, info2 = GetCursorInfo();
+		
+		if (infoType == "item") then
+			print("Add item to council ...", info1, info2);
+			local lootCount = table.getn(lootTable)
+			local item = info2;
+			
+			tinsert(lootTable, item) -- add the item link to the table
+			tinsert(itemsToLootIndex, lootCount + 1) -- add its index to the lootTable
+			
+			-- SolutionLC_Mainframe.Update(true)
+			
+			SolutionLC_LootFrame:AddItem(lootTable, item)
+			-- SolutionLC_LootFrame:Update(lootTable) -- setup our own loot frames
+			SolutionLC_Mainframe.prepareLootFrame(item)	
+		end
+		
+		ClearCursor();
+	end);
 
 	if IsInGuild() then
 		self:SendCommMessage("SolutionLC", "verTest "..version, "GUILD") -- send out a version check
@@ -310,7 +332,7 @@ end
 -----------------------------------------
 function SolutionLC.EventHandler(self2, event, ...)
 	if event == "LOOT_OPENED" then
-		if isMasterLooter and isRunning and (IsInRaid() or nnp) then -- if we're masterlooter and addon is enabled or debug is on
+		if isMasterLooter and isRunning and #itemsToLootIndex == 0 and (IsInRaid() or nnp) then -- if we're masterlooter and addon is enabled or debug is on
 			self:debugS("event = "..event)
 			if GetNumLootItems() >= 1 then -- if there's something to loot
 				if not InCombatLockdown() then
@@ -371,7 +393,7 @@ function SolutionLC.EventHandler(self2, event, ...)
 		if isMasterLooter then
 			self:debugS("event = "..event)
 			self:UnhookAll()
-			if itemRunning then -- the loot window closed too early
+			if itemRunning and not awardLootAsync then -- the loot window closed too early
 				DEFAULT_CHAT_FRAME:AddMessage("SolutionLC cannot loot anything without the loot window being open!", 1, 0.5, 0, 1, 10)
 				DEFAULT_CHAT_FRAME:AddMessage("Please restart the looting session.", 1, 0.5, 0, 1, 10)
 				SolutionLC_Mainframe.abortLooting()
@@ -943,7 +965,7 @@ function SolutionLC_initiateLoot(item)
 			return;
 		else -- we're not running an item
 			itemRunning = item;			
-			-- create the table of in-raid-councilmembers to send to the councillors
+			-- create the table of in-raid-council members to send to council members
 			for _, v in ipairs(db.council) do
 				if UnitInRaid(v) then
 					tinsert(currentCouncil, v)
@@ -1027,13 +1049,13 @@ function SolutionLC_Mainframe.prepareLootFrame(item)
 		-- Award string
 		AwardString:Hide()
 		if isMasterLooter or isTesting then
-			if currentSession > lootNum then
+			if currentSession > lootNum and not awardLootAsync then
 				AwardString:Show()
 				AwardString:SetText("You can't award this item yet!")
 				AwardString:SetTextColor(1,0,0,1)
 			end	
 		end
-		if currentSession < lootNum then				
+		if currentSession < lootNum then
 			AwardString:SetText("This item has been awarded.")
 			AwardString:SetTextColor(0,1,0,1)
 			AwardString:Show()
@@ -1289,6 +1311,11 @@ function SolutionLC_Mainframe.isSelected(id)
 	return entryTable[currentSession][id] == selection
 end
 
+function SolutionLC_Mainframe.hasItemBeenAwarded(currentSession)
+	-- TODO : Check to see if awarded item array contains currentSession
+	return false;
+end
+
 ------------ updateSelection ----------------
 -- Selects or updates a given entry
 ---------------------------------------------
@@ -1318,7 +1345,7 @@ function SolutionLC_Mainframe.updateSelection(id, update)
 		if isMasterLooter or isTesting then
 			BtRemove:Show()
 			BtAward:Hide()
-			if currentSession == lootNum then
+			if currentSession == lootNum or (awardLootAsync and not SolutionLC_Mainframe.hasItemBeenAwarded(currentSession)) then
 				BtAward:Show()
 			end	
 		else
@@ -1491,8 +1518,16 @@ function SolutionLC_Mainframe.award(reason)
 		return;
 	elseif isTesting then
 		if IsInRaid() or nnp then -- continue
-			self:Print("The item would now be awarded to "..selection[1])
-			if lootNum < #itemsToLootIndex then -- if there's more items to loot
+			self:Print("The item would now be awarded to " .. selection[1])
+			if awardLootAsync then -- TODO : AND keep track of items awarded and only do this if the items awarded count is less than the items to loot count.
+				isTesting = true;
+				-- TODO : Find the next item we need to award and initiateNext(lootTable[foundItemNumber]);
+				self:debug("Add item to items awarded array");
+				self:debug(lootTable[currentSession])
+				-- for k,v in pairs(lootTable[currentSession]) do
+					-- self:Print(k, ": ", v);
+				-- end
+			elseif lootNum < #itemsToLootIndex then -- if there's more items to loot
 				SolutionLC_Mainframe.abortLooting() -- stop the current looting
 				lootNum = lootNum + 1; 
 				isTesting = true
@@ -1510,6 +1545,8 @@ function SolutionLC_Mainframe.award(reason)
 			SolutionLC_Mainframe.stopLooting()
 		end
 		return;
+	elseif awardLootAsync then
+		self:debugS("Async Award Loot");
 	else -- if there are
 		for i = 1, GetNumGroupMembers() do
 			if GetMasterLootCandidate(itemsToLootIndex[lootNum], i) == selection[1] then
@@ -2496,7 +2533,7 @@ function SolutionLC_Mainframe:SessionButtonOnEnter(id)
 		GameTooltip:AddLine("You must award this item before the others.", 1,1,1)
 		GameTooltip:AddLine("All whispers received will be added to this item.",1,1,1)
 	elseif id == currentSession then
-		GameTooltip:AddLine("This item is currently showed.")
+		GameTooltip:AddLine("This item is currently shown.")
 	elseif id < lootNum then 
 		GameTooltip:AddLine("This item has been awarded!",1,0,0)
 	else
