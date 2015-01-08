@@ -495,6 +495,7 @@ function SolutionLC:OnCommReceived(prefix, msg, distri, sender)
 			self:debugS("Comm received, cmd: "..cmd..", sender: "..sender)
 		end
 		if sender == GetUnitName("player",true) and distri ~= "WHISPER" then return end; -- don't do anything if we send the message, unless it was a whisper
+		
 		if cmd == 'start' and (isCouncil or isMasterLooter) then
 			if not isMasterLooter or nnp then
 				SolutionLC_Mainframe.abortLooting() -- start with aborting, just in case the masterlooter disconnects during looting
@@ -596,11 +597,6 @@ function SolutionLC:OnCommReceived(prefix, msg, distri, sender)
 						return;
 					end
 					SolutionLC_Mainframe.voteOther(session, name, devote, sender)
-					if isMasterLooter then -- insert the voter's name to the table
-						if not tContains(votersNames, sender) then
-							tinsert(votersNames, sender)
-						end
-					end
 					return;
 				end
 			end
@@ -928,23 +924,22 @@ function SolutionLC:ChatCommand(msg)
 		self:Print("Players can whisper (or through Raidchat if enabled) their current item(s) followed by a keyword to the Master Looter if they don't have the addon installed.\nThe keyword list is found under the 'Buttons, Responses and Whispers' option tab.\nPlayers can whisper 'slchelp' to the Master Looter to retrieve this list.\nNOTE: Players should still get the addon installed, otherwise all character information won't be available.")
     
 	elseif input == "reset" then
-		if SolutionLC_LootFrame then
-			SolutionLC_LootFrame:ClearAllPoints()
-			SolutionLC_LootFrame:SetPoint("CENTER", 0, -200)
+		if SolutionLootFrame then
+			SolutionLootFrame:ClearAllPoints()
+			SolutionLootFrame:SetPoint("CENTER", 0, -200)
 		end
 		if MainFrame then
 			MainFrame:ClearAllPoints()
 			MainFrame:SetPoint("CENTER", 0, 200)
 		end
-		if RCVersionFrame then
-			RCVersionFrame:ClearAllPoints()
-			RCVersionFrame:SetPoint("CENTER", -400, 0)
+		if SolutionVersionFrame then
+			SolutionVersionFrame:ClearAllPoints()
+			SolutionVersionFrame:SetPoint("CENTER", -400, 0)
 		end
-		if RCLootHistoryFrame then
-			RCLootHistoryFrame:ClearAllPoints()
-			RCLootHistoryFrame:SetPoint("CENTER", -400, 0)		
+		if SolutionLootHistoryFrame then
+			SolutionLootHistoryFrame:ClearAllPoints()
+			SolutionLootHistoryFrame:SetPoint("CENTER", -400, 0)		
 		end	
-	
 	elseif input == "debuglog" or input == "log" then
 		for k,v in ipairs(debugLog) do
 			print(k.." - "..v)
@@ -1121,7 +1116,7 @@ local INVTYPE_Slots = {
 function SolutionLC.getCurrentGear(item)
 	local itemID = tonumber(strmatch(item, "item:(%d+):")) -- extract itemID
 	-- check if the item is a token, and if it is, return the matching current gear
-	if RCTokenTable[itemID] then return GetInventoryItemLink("player", GetInventorySlotInfo(RCTokenTable[itemID])), nil; end
+	if SolutionTokenTable[itemID] then return GetInventoryItemLink("player", GetInventorySlotInfo(SolutionTokenTable[itemID])), nil; end
 	local _, _, _, _, _, _, _, _, thisItemEquipLoc = GetItemInfo(item);
 	local item1, item2;
 	local slot = INVTYPE_Slots[thisItemEquipLoc]
@@ -1464,9 +1459,9 @@ function SolutionLC_Mainframe.vote(id)
 			end
 			
 			self:SendCommMessage("SolutionLC", "vote "..currentSession.." "..entryTable[currentSession][id][1].." devote", channel) -- tell everyone who you vote for
-			if isMasterLooter and tContains(votersNames, masterLooter) then
+			if (isMasterLooter or isCouncil) and tContains(votersNames, GetUnitName("player",true)) then
 				for k,v in pairs(votersNames) do
-					if v == masterLooter then
+					if v == GetUnitName("player",true) then
 						tremove(votersNames, k)
 					end
 				end
@@ -1487,8 +1482,8 @@ function SolutionLC_Mainframe.vote(id)
 			entryTable[currentSession][id][11] = true
 			tinsert((entryTable[currentSession][id][12]), GetUnitName("player",true)) -- add the voter to the voters table
 			self:SendCommMessage("SolutionLC", "vote "..currentSession.." "..entryTable[currentSession][id][1].." vote", channel) -- tell everyone who you devote for
-			if isMasterLooter and not tContains(votersNames, masterLooter) then
-				tinsert(votersNames, masterLooter)
+			if (isMasterLooter or isCouncil) and not tContains(votersNames, GetUnitName("player",true)) then
+				tinsert(votersNames, GetUnitName("player",true))
 			end
 			SolutionLC_Mainframe.Update(true); -- update the list
 		end
@@ -1511,9 +1506,21 @@ function SolutionLC_Mainframe.voteOther(session, name, devote, voter)
 					for k,v in pairs(entryTable[session][i][12]) do -- remove the voter from voters table
 						if v == voter then tremove(entryTable[session][i][12], k); end
 					end
+					
+					if (isMasterLooter or isCouncil) and tContains(votersNames, voter) then
+						for l,v in pairs(votersNames) do
+							if v == voter then
+								tremove(votersNames, l)
+							end
+						end
+					end
 				else
 					entryTable[session][i][8] = entryTable[session][i][8] + 1; -- add the vote
 					tinsert((entryTable[session][i][12]), voter) -- add the voter to the voters table
+					
+					if (isMasterLooter or isCouncil) and not tContains(votersNames, voter) then
+						tinsert(votersNames, voter)
+					end
 				end
 				SolutionLC_Mainframe.Update(true); -- update the list
 				return;
@@ -1884,7 +1891,7 @@ function SolutionLC_Mainframe.isCouncil()
 end
 
 ------------ setRank -----------------------
--- Gets the minimum rank from RCRankFrame
+-- Gets the minimum rank from RankFrame
 -- and saves the council accordingly
 --------------------------------------------
 function SolutionLC_Mainframe.setRank(rank)
@@ -1915,10 +1922,10 @@ function SolutionLC_Mainframe.Update(update)
 	-- People still to roll string
 	if #entryTable[currentSession] == GetNumGroupMembers() or (GetNumGroupMembers() == 0 and #entryTable[currentSession] == 1) then -- if everybody has rolled or we're alone
 		PeopleToRollLabel:SetTextColor(0,1,0,1) -- make the text green
-		if isMasterLooter and #votersNames == #currentCouncil then
+		if (isMasterLooter or isCouncil) and #votersNames == #currentCouncil then
 			PeopleToRollLabel:SetText("Everyone has rolled and voted!")	
-		elseif isMasterLooter then
-			PeopleToRollLabel:SetText("Everyone has rolled - "..#votersNames.." of "..#currentCouncil.." have voted!")
+		elseif isMasterLooter or isCouncil then
+			PeopleToRollLabel:SetText("Everyone has rolled - "..#votersNames.." of "..#currentCouncil.." has voted!")
 			PeopleToRollLabel:SetTextColor(1,1,0,1) -- make the text yellow
 		else
 			PeopleToRollLabel:SetText("Everyone has rolled!")
@@ -1940,12 +1947,12 @@ function SolutionLC_Mainframe.Update(update)
 			PeopleToRollLabel:SetTextColor(0.75, 0.75,0.75,1) -- make the text gray
 		end		
 
-	else -- if someone haven't rolled
+	else -- if someone hasn't rolled
 		PeopleToRollLabel:SetTextColor(1,1,1,1) -- make the text white
-		if isMasterLooter and #votersNames == #currentCouncil then
+		if (isMasterLooter or isCouncil) and #votersNames == #currentCouncil then
 			PeopleToRollLabel:SetText(""..GetNumGroupMembers() - #entryTable[currentSession].." - everyone have voted!")
 			PeopleToRollLabel:SetTextColor(1,0,0,1) -- make the text red
-		elseif isMasterLooter and #votersNames > 0 then
+		elseif (isMasterLooter or isCouncil) and #votersNames > 0 then
 			PeopleToRollLabel:SetText(""..GetNumGroupMembers() - #entryTable[currentSession].." - "..#votersNames.." of "..#currentCouncil.." have voted!")
 		else
 			PeopleToRollLabel:SetText(GetNumGroupMembers() - #entryTable[currentSession])					
@@ -2192,7 +2199,7 @@ function SolutionLC_Mainframe:PeopleToRollHover()
 	else
 		GameTooltip:AddLine("None",1,1,1)
 	end
-	if isMasterLooter and (not mlDB.anonymousVoting or (mlDB.anonymousVoting and mlDB.masterLooterOnly)) then -- add the voters info
+	if (isMasterLooter or isCouncil) and (not mlDB.anonymousVoting or (mlDB.anonymousVoting and mlDB.masterLooterOnly)) then -- add the voters info
 		GameTooltip:AddLine("Voters\n")
 		for k,v in pairs(currentCouncil) do
 			if tContains(votersNames, v) then

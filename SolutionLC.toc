@@ -3,7 +3,7 @@
 ## Notes: Interface for running an efficient Loot Council.
 ## SavedVariables: SolutionLCDB
 ## Title: Solution LC
-## Version: 0.2.1
+## Version: 0.2.2
 
 embeds.xml
 MainFrame.xml

@@ -7,8 +7,8 @@ local _;
 
 function SolutionLC_LootFrame:CreateFrame(id)
 	SolutionLC:debugS("LootFrame:CreateFrame("..tostring(id)..")")
-	local frame = CreateFrame("Frame", "$parentEntry"..id, RCLootFrame, "RCLootFrameEntry")
-	frame:SetPoint("TOPLEFT", RCLootFrame)
+	local frame = CreateFrame("Frame", "$parentEntry"..id, SolutionLootFrame, "SolutionLootFrameEntry")
+	frame:SetPoint("TOPLEFT", SolutionLootFrame)
 	frame:SetID(id)
 
 	-- Note button
@@ -100,7 +100,7 @@ function SolutionLC_LootFrame:AddItem(lootTable, item)
 	for j = 1, db.numButtons do
 		local button = frame.buttons[j]
 		if not button then -- create it
-			button = CreateFrame("button", "$parentButton"..j, frame, "RCLootFrame_Button")
+			button = CreateFrame("button", "$parentButton"..j, frame, "SolutionLootFrame_Button")
 			button:SetID(j)				
 			if j == 1 then -- first needs specific anchor
 				button:SetPoint("BOTTOMLEFT", 65, 10)				
@@ -132,17 +132,17 @@ function SolutionLC_LootFrame:AddItem(lootTable, item)
 
 		-- make sure the width doesn't get less than the length of the item
 		if lootFrameWidth - 50 < hoverWidth then lootFrameWidth = hoverWidth + 50; end 
-		RCLootFrame:SetWidth(lootFrameWidth)
+		SolutionLootFrame:SetWidth(lootFrameWidth)
 
 		frame:SetWidth(lootFrameWidth)
-		getglobal("RCLootFrameEntry"..i.."Hover2"):SetWidth(hoverWidth)
-		getglobal("RCLootFrameEntry"..i.."ItemLabel"):SetText(link);
-		getglobal("RCLootFrameEntry"..i.."ItemLabel"):SetFont("Fonts\\FRIZQT__.TTF", 16);
-		getglobal("RCLootFrameEntry"..i.."Texture"):SetTexture(texture);
-		getglobal("RCLootFrameEntry"..i.."Ilvl"):SetText("ilvl: "..ilvl);
-		getglobal("RCLootFrameEntry"..i.."Ilvl"):SetPoint("TOPRIGHT", "$parent", "TOPRIGHT", -2, -5)
-		RCLootFrame:SetHeight(i * 75)
-		RCLootFrame:SetWidth(lootFrameWidth)
+		getglobal("SolutionLootFrameEntry"..i.."Hover2"):SetWidth(hoverWidth)
+		getglobal("SolutionLootFrameEntry"..i.."ItemLabel"):SetText(link);
+		getglobal("SolutionLootFrameEntry"..i.."ItemLabel"):SetFont("Fonts\\FRIZQT__.TTF", 16);
+		getglobal("SolutionLootFrameEntry"..i.."Texture"):SetTexture(texture);
+		getglobal("SolutionLootFrameEntry"..i.."Ilvl"):SetText("ilvl: "..ilvl);
+		getglobal("SolutionLootFrameEntry"..i.."Ilvl"):SetPoint("TOPRIGHT", "$parent", "TOPRIGHT", -2, -5)
+		SolutionLootFrame:SetHeight(i * 75)
+		SolutionLootFrame:SetWidth(lootFrameWidth)
 		frame:Show();
 		lootFrames[i] = frame
 	end
@@ -157,7 +157,7 @@ function SolutionLC_LootFrame:AddItem(lootTable, item)
 		lootFrames[i]:SetPoint("TOPLEFT", lootFrames[i-1], "BOTTOMLEFT")
 	end
 	
-	RCLootFrame:Show()
+	SolutionLootFrame:Show()
 end
 
 function SolutionLC_LootFrame:Update(lootTable, newRollRequest)
@@ -205,7 +205,7 @@ function SolutionLC_LootFrame:Update(lootTable, newRollRequest)
 		for j = 1, db.numButtons do
 			local button = frame.buttons[j]
 			if not button then -- create it
-				button = CreateFrame("button", "$parentButton"..j, frame, "RCLootFrame_Button")
+				button = CreateFrame("button", "$parentButton"..j, frame, "SolutionLootFrame_Button")
 				button:SetID(j)				
 				if j == 1 then -- first needs specific anchor
 					button:SetPoint("BOTTOMLEFT", 65, 10)				
@@ -237,17 +237,17 @@ function SolutionLC_LootFrame:Update(lootTable, newRollRequest)
 
 			-- make sure the width doesn't get less than the length of the item
 			if lootFrameWidth - 50 < hoverWidth then lootFrameWidth = hoverWidth + 50; end 
-			RCLootFrame:SetWidth(lootFrameWidth)
+			SolutionLootFrame:SetWidth(lootFrameWidth)
 
 			frame:SetWidth(lootFrameWidth)
-			getglobal("RCLootFrameEntry"..i.."Hover2"):SetWidth(hoverWidth)
-			getglobal("RCLootFrameEntry"..i.."ItemLabel"):SetText(link);
-			getglobal("RCLootFrameEntry"..i.."ItemLabel"):SetFont("Fonts\\FRIZQT__.TTF", 16);
-			getglobal("RCLootFrameEntry"..i.."Texture"):SetTexture(texture);
-			getglobal("RCLootFrameEntry"..i.."Ilvl"):SetText("ilvl: "..ilvl);
-			getglobal("RCLootFrameEntry"..i.."Ilvl"):SetPoint("TOPRIGHT", "$parent", "TOPRIGHT", -2, -5)
-			RCLootFrame:SetHeight(i * 75)
-			RCLootFrame:SetWidth(lootFrameWidth)
+			getglobal("SolutionLootFrameEntry"..i.."Hover2"):SetWidth(hoverWidth)
+			getglobal("SolutionLootFrameEntry"..i.."ItemLabel"):SetText(link);
+			getglobal("SolutionLootFrameEntry"..i.."ItemLabel"):SetFont("Fonts\\FRIZQT__.TTF", 16);
+			getglobal("SolutionLootFrameEntry"..i.."Texture"):SetTexture(texture);
+			getglobal("SolutionLootFrameEntry"..i.."Ilvl"):SetText("ilvl: "..ilvl);
+			getglobal("SolutionLootFrameEntry"..i.."Ilvl"):SetPoint("TOPRIGHT", "$parent", "TOPRIGHT", -2, -5)
+			SolutionLootFrame:SetHeight(i * 75)
+			SolutionLootFrame:SetWidth(lootFrameWidth)
 			frame:Show();
 			lootFrames[i] = frame
 		end
@@ -276,14 +276,14 @@ function SolutionLC_LootFrame:Update(lootTable, newRollRequest)
 		SolutionLC_LootFrame.hide()
 		return;
 	end
-	RCLootFrame:Show()
+	SolutionLootFrame:Show()
 end
 
 ---------- ShowTooltip -------------
 -- Shows the loot item's tooltip
 ------------------------------------
 function SolutionLC_LootFrame.ShowTooltip(frame)
-	GameTooltip:SetOwner(RCLootFrame, "ANCHOR_CURSOR")
+	GameTooltip:SetOwner(SolutionLootFrame, "ANCHOR_CURSOR")
 	GameTooltip:SetHyperlink(frame.item)
 	GameTooltip:Show()
 end
@@ -310,8 +310,8 @@ end
 -- Hides the loot frame 
 ------------------------------------
 function SolutionLC_LootFrame.hide()
-	if RCLootFrame:IsShown() then
+	if SolutionLootFrame:IsShown() then
 		wipe(itemsLooting)
-		RCLootFrame:Hide()
+		SolutionLootFrame:Hide()
 	end
 end

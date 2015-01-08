@@ -1,6 +1,6 @@
 ﻿-- Contains itemIDs and their equivalent equip location
 
-RCTokenTable = {
+SolutionTokenTable = {
 	--[xxxxxx] = "ExampleSlot",
 
 	-- TIER 17	 Blackrock Foundry ---------------------------

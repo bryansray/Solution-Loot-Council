@@ -1,4 +1,4 @@
-﻿-- LootHistory.lua: Manages the Loot History Frame
+﻿-- Manages the Loot History Frame
 
 local addon = LibStub("AceAddon-3.0"):GetAddon("SolutionLC")
 LootHistory = addon:NewModule("LootHistory", "AceTimer-3.0")
@@ -20,16 +20,16 @@ local contentTable = {}
 
 function LootHistory:OnLoad()
 	-- create the entries
-	local entry = CreateFrame("Button", "$parentEntry1", RCLootHistoryFrameScrollFrame, "RCLootHistoryEntry")
+	local entry = CreateFrame("Button", "$parentEntry1", SolutionLootHistoryFrameScrollFrame, "SolutionLootHistoryEntry")
 	entry:SetID(1)
 	entry:SetPoint("TOPLEFT", 4, -4)
 	for i = 2, 13 do
-		entry = CreateFrame("Button", "$parentEntry"..i, RCLootHistoryFrameScrollFrame, "RCLootHistoryEntry")
+		entry = CreateFrame("Button", "$parentEntry"..i, SolutionLootHistoryFrameScrollFrame, "SolutionLootHistoryEntry")
 		entry:SetID(i)
 		entry:SetPoint("TOP", "$parentEntry"..(i-1), "BOTTOM")
 	end	
 	-- create dropdown frame
-	dropDownFrame = CreateFrame("FRAME", nil, RCLootHistoryFrame, "UIDropDownMenuTemplate")
+	dropDownFrame = CreateFrame("FRAME", nil, SolutionLootHistoryFrame, "UIDropDownMenuTemplate")
 end
 
 function LootHistory:OnEnable()
@@ -59,10 +59,10 @@ function LootHistory:OnDisable()
 end
 
 function LootHistory:Update()
-	FauxScrollFrame_Update(RCLootHistoryFrameScrollFrame, #contentTable, 13, 20, nil, nil, nil, nil, nil, nil, true);
-	offset = FauxScrollFrame_GetOffset(RCLootHistoryFrameScrollFrame)
+	FauxScrollFrame_Update(SolutionLootHistoryFrameScrollFrame, #contentTable, 13, 20, nil, nil, nil, nil, nil, nil, true);
+	offset = FauxScrollFrame_GetOffset(SolutionLootHistoryFrameScrollFrame)
 	local mlDB = SolutionLC:GetVariable("mlDB")
-	local frame = "RCLootHistoryFrameScrollFrame"
+	local frame = "SolutionLootHistoryFrameScrollFrame"
 	for i = 1, 13 do
 		local line = offset + i
 		if contentTable[line] then
@@ -97,7 +97,7 @@ function LootHistory:Select(id)
 end	
 
 function LootHistory:UpdateSelection()
-	local frame = "RCLootHistoryFrameString"
+	local frame = "SolutionLootHistoryFrameString"
 	if selection.playerName then
 		local numLoots, numTime, numMSloot = 0, 0, 0
 		for k,v in pairs(lootDB[selection.playerName]) do
@@ -123,7 +123,7 @@ function LootHistory:MouseOver(id)
 	id = id + offset
 	local dateString = SolutionLC:GetNumberOfDaysFromNow(contentTable[id].date)
 	local _, _, _,ilvl = GetItemInfo(string.match(contentTable[id].lootWon, "|%x+|Hitem:.-|h.-|h|r"));
-	GameTooltip:SetOwner(RCLootHistoryFrame, "ANCHOR_RIGHT", 0, -150)
+	GameTooltip:SetOwner(SolutionLootHistoryFrame, "ANCHOR_RIGHT", 0, -150)
 	GameTooltip:AddDoubleLine("Time since loot recieved:",		dateString, 1,1,1, 1,1,1)
 	GameTooltip:AddDoubleLine("Item given:",					contentTable[id].lootWon, 1,1,1, 1,1,1)
 	GameTooltip:AddDoubleLine("ilvl:",							ilvl, 1,1,1, 1,1,1)
@@ -150,6 +150,6 @@ function LootHistory:SetFilterPasses()
 end
 
 function LootHistory:Close()
-	RCLootHistoryFrame:Hide()
+	SolutionLootHistoryFrame:Hide()
 	SolutionLC:DisableModule("LootHistory")
 end

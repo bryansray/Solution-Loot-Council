@@ -1,6 +1,4 @@
-﻿-- Author      : nnp_home
--- Create Date : 8/14/2012 9:16:20 AM
--- RCVersionFrame.lua - Displays version checks
+﻿-- Displays version checks
 
 local addon = LibStub("AceAddon-3.0"):GetAddon("SolutionLC")
 SolutionLC_VersionFrame = addon:NewModule("SolutionLC_VersionFrame", "AceTimer-3.0")
@@ -11,22 +9,22 @@ local newestVersion = version
 local currSortIndex, sortMethod;
 
 function SolutionLC_VersionFrame:OnEnable()
-	local entry = CreateFrame("Button", "$parentEntry1", RCVersionFrameContentFrame, "RCVersionFrameEntry"); -- Creates the first row
+	local entry = CreateFrame("Button", "$parentEntry1", SolutionVersionFrameContentFrame, "SolutionVersionFrameEntry"); -- Creates the first row
 	entry:SetID(1); -- Set the ID
 	entry:SetPoint("TOPLEFT", 4, -4) -- Set anchor
 	for i = 2, 10 do -- Create the rest of the rows
-		local entry = CreateFrame("Button", "$parentEntry"..i, RCVersionFrameContentFrame, "RCVersionFrameEntry");
+		local entry = CreateFrame("Button", "$parentEntry"..i, SolutionVersionFrameContentFrame, "SolutionVersionFrameEntry");
 		entry:SetID(i);
 		entry:SetPoint("TOP", "$parentEntry"..(i-1), "BOTTOM") -- Set the anchor to the row above
 	end
 	SolutionLC_VersionFrame:AddSelf()
 	SolutionLC_VersionFrame:Update()
-	RCVersionFrame:Show()
+	SolutionVersionFrame:Show()
 end
 
 function SolutionLC_VersionFrame:OnDisable()
 	wipe(contentTable)
-	RCVersionFrame:Hide()
+	SolutionVersionFrame:Hide()
 end
 
 function SolutionLC_VersionFrame:CloseButtonClick()
@@ -80,34 +78,34 @@ function SolutionLC_VersionFrame:Timeout()
 end
 
 function SolutionLC_VersionFrame:Update()
-	FauxScrollFrame_Update(RCVersionFrameContentFrame, #contentTable, 10, 20, nil, nil, nil, nil, nil, nil, true);
-	local offset = FauxScrollFrame_GetOffset(RCVersionFrameContentFrame)
+	FauxScrollFrame_Update(SolutionVersionFrameContentFrame, #contentTable, 10, 20, nil, nil, nil, nil, nil, nil, true);
+	local offset = FauxScrollFrame_GetOffset(SolutionVersionFrameContentFrame)
 	for i = 1, 10 do 
 		local line = offset + i;
 		if contentTable[line] then -- if there's something at a given entry
 			local entry = contentTable[line]
-			SolutionLC_Mainframe.setCharName(getglobal("RCVersionFrameContentFrameEntry"..i.."Name"), entry[1], entry[2])
-			SolutionLC_Mainframe.setClassIcon(getglobal("RCVersionFrameContentFrameEntry"..i.."ClassTexture"), entry[1]);
-			getglobal("RCVersionFrameContentFrameEntry"..i.."Rank"):SetText(entry[3])
-			getglobal("RCVersionFrameContentFrameEntry"..i.."Version"):SetText("v"..entry[4])
+			SolutionLC_Mainframe.setCharName(getglobal("SolutionVersionFrameContentFrameEntry"..i.."Name"), entry[1], entry[2])
+			SolutionLC_Mainframe.setClassIcon(getglobal("SolutionVersionFrameContentFrameEntry"..i.."ClassTexture"), entry[1]);
+			getglobal("SolutionVersionFrameContentFrameEntry"..i.."Rank"):SetText(entry[3])
+			getglobal("SolutionVersionFrameContentFrameEntry"..i.."Version"):SetText("v"..entry[4])
 			
 			if entry[4] == "Not installed" then
-				getglobal("RCVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(0.75,0.75,0.75,1) -- grey
-				getglobal("RCVersionFrameContentFrameEntry"..i.."Version"):SetText(entry[4])
+				getglobal("SolutionVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(0.75,0.75,0.75,1) -- grey
+				getglobal("SolutionVersionFrameContentFrameEntry"..i.."Version"):SetText(entry[4])
 
 			elseif entry[3] == "Unknown" then
-				getglobal("RCVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(0.75,0.75,0.75,1) -- grey
-				getglobal("RCVersionFrameContentFrameEntry"..i.."Version"):SetText("Old - "..entry[4])
+				getglobal("SolutionVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(0.75,0.75,0.75,1) -- grey
+				getglobal("SolutionVersionFrameContentFrameEntry"..i.."Version"):SetText("Old - "..entry[4])
 
 			elseif newestVersion <= entry[4] then
 				newestVersion = entry[4]
-				getglobal("RCVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(0,1,0,1) -- green
+				getglobal("SolutionVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(0,1,0,1) -- green
 			else
-				getglobal("RCVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(1,0,0,1) -- red
+				getglobal("SolutionVersionFrameContentFrameEntry"..i.."Version"):SetTextColor(1,0,0,1) -- red
 			end
-			getglobal("RCVersionFrameContentFrameEntry"..i):Show()
+			getglobal("SolutionVersionFrameContentFrameEntry"..i):Show()
 		else
-			getglobal("RCVersionFrameContentFrameEntry"..i):Hide()
+			getglobal("SolutionVersionFrameContentFrameEntry"..i):Hide()
 		end
 	end
 end

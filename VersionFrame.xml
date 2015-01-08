@@ -1,6 +1,6 @@
 ﻿<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="VersionFrame.lua" />
-	<Button name="RCVersionFrameEntry" virtual="true" hidden="true" text="">
+	<Button name="SolutionVersionFrameEntry" virtual="true" hidden="true" text="">
 		<Size>
 			<AbsDimension x="393" y="20" />
 		</Size>
@@ -68,7 +68,7 @@
 			<Color a="0.35" r="1" g="0.84" b="0" />
 		</NormalTexture>
 	</Button>
-	<Frame name="RCVersionFrame" hidden="true" parent="UIParent" toplevel="true" movable="true" enableMouse="true">
+	<Frame name="SolutionVersionFrame" hidden="true" parent="UIParent" toplevel="true" movable="true" enableMouse="true">
 		<Size>
 			<AbsDimension x="435" y="322" />
 		</Size>
@@ -191,7 +191,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="HeaderName" inherits="RCLootCouncil_Header" text="Name">
+			<Button name="HeaderName" inherits="SolutionLootCouncil_Header" text="Name">
 				<Size>
 					<AbsDimension x="75" y="23" />
 				</Size>
@@ -206,7 +206,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="HeaderRank" inherits="RCLootCouncil_Header" id="1" text="Rank">
+			<Button name="HeaderRank" inherits="SolutionLootCouncil_Header" id="1" text="Rank">
 				<Size>
 					<AbsDimension x="75" y="23" />
 				</Size>
@@ -221,7 +221,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="HeaderVersion" inherits="RCLootCouncil_Header" id="2" text="Version">
+			<Button name="HeaderVersion" inherits="SolutionLootCouncil_Header" id="2" text="Version">
 				<Size>
 					<AbsDimension x="75" y="23" />
 				</Size>
@@ -239,10 +239,10 @@
 		</Frames>
 		<Scripts>
 			<OnDragStart>
-				RCVersionFrame:StartMoving();
+				SolutionVersionFrame:StartMoving();
 			</OnDragStart>
 			<OnDragStop>
-				RCVersionFrame:StopMovingOrSizing();
+				SolutionVersionFrame:StopMovingOrSizing();
 			</OnDragStop>
 			<OnLoad>
 				self:RegisterForDrag("LeftButton")

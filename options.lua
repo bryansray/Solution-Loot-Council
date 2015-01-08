@@ -1,5 +1,3 @@
--- Author      : Potdisc
--- Create Date : 5/24/2012 6:24:55 PM
 -- options.lua - option frame in BlizOptions for SolutionLC
 local addon = LibStub("AceAddon-3.0"):GetAddon("SolutionLC")
 
@@ -47,7 +45,7 @@ function addon:OptionsTable()
 						args = {
 							testDesc = {
 								order = 1,
-								name = "Solo Test will only display frames as setup by youself locally, and with one item. Raid Test will display your configuration to everyone in your raid and allow voting for anyone configured as being a council member by you. In a real raid situation, the Master Looter's configuration is always used.\nTo Raid Test with more or less than 5 items, use \"/rc test #\".\n",
+								name = "Solo Test will only display frames as setup by youself locally, and with one item. Raid Test will display your configuration to everyone in your raid and allow voting for anyone configured as being a council member by you. In a real raid situation, the Master Looter's configuration is always used.\nTo Raid Test with more or less than 5 items, use \"/slc test #\".\n",
 								type = "description"	
 							},
 							testButton = {
@@ -528,7 +526,7 @@ function addon:OptionsTable()
 							},
 							desc = {
 								order = 2,
-								name = "To get added to the consideration list, without having the addon installed, raiders can link their item(s) followed by a keyword to the Master Looter (Button 1 is used if no keyword is specified).\nExample: \"/w ML_NAME [ITEM] greed\" would by default show up as you greeding on an item.\nBelow you can choose keywords for the individual buttons, seperated by punctation or spaces. Only numbers and words are accepted.\nPlayers can recieve the keyword list by messaging 'rchelp' to the Master Looter once the addon is enabled (i.e. in a raid).",
+								name = "To get added to the consideration list, without having the addon installed, raiders can link their item(s) followed by a keyword to the Master Looter (Button 1 is used if no keyword is specified).\nExample: \"/w ML_NAME [ITEM] greed\" would by default show up as you greeding on an item.\nBelow you can choose keywords for the individual buttons, seperated by punctation or spaces. Only numbers and words are accepted.\nPlayers can recieve the keyword list by messaging 'slchelp' to the Master Looter once the addon is enabled (i.e. in a raid).",
 								type = "description",
 							},
 						},

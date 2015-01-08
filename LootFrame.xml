@@ -1,6 +1,6 @@
 <Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="LootFrame.lua" />
-	<Button name="RCLootFrame_Button" inherits="UIPanelButtonTemplate" virtual="true" text="">
+	<Button name="SolutionLootFrame_Button" inherits="UIPanelButtonTemplate" virtual="true" text="">
 		<Size>
 			<AbsDimension x="122" y="20" />
 		</Size>
@@ -10,7 +10,7 @@
 			</OnClick>
 		</Scripts>
 	</Button>
-	<Frame name="RCLootFrameEntry" virtual="true" hidden="true" frameStrata="HIGH">
+	<Frame name="SolutionLootFrameEntry" virtual="true" hidden="true" frameStrata="HIGH">
 		<Size>
 			<AbsDimension x="501" y="75" />
 		</Size>
@@ -91,10 +91,10 @@
 				</Backdrop>
 				<Scripts>
 					<OnDragStart>
-						RCLootFrame:StartMoving();
+						SolutionLootFrame:StartMoving();
 					</OnDragStart>
 					<OnDragStop>
-						RCLootFrame:StopMovingOrSizing();
+						SolutionLootFrame:StopMovingOrSizing();
 					</OnDragStop>
 					<OnEnter>
 						SolutionLC_LootFrame.ShowTooltip((self:GetParent()));
@@ -121,10 +121,10 @@
 				</Backdrop>
 				<Scripts>
 					<OnDragStart>
-						RCLootFrame:StartMoving();
+						SolutionLootFrame:StartMoving();
 					</OnDragStart>
 					<OnDragStop>
-						RCLootFrame:StopMovingOrSizing();
+						SolutionLootFrame:StopMovingOrSizing();
 					</OnDragStop>
 					<OnEnter>
 						SolutionLC_LootFrame.ShowTooltip((self:GetParent()));
@@ -137,10 +137,10 @@
 		</Frames>
 		<Scripts>
 			<OnDragStart>
-				RCLootFrame:StartMoving();
+				SolutionLootFrame:StartMoving();
 			</OnDragStart>
 			<OnDragStop>
-				RCLootFrame:StopMovingOrSizing();
+				SolutionLootFrame:StopMovingOrSizing();
 			</OnDragStop>
 			<OnLoad>
 				self:RegisterForDrag("LeftButton");
@@ -148,7 +148,7 @@
 		</Scripts>
 	</Frame>
 	
-	<Frame name="RCLootFrame" parent="UIParent" movable="true" enableMouse="true">
+	<Frame name="SolutionLootFrame" parent="UIParent" movable="true" enableMouse="true">
 		<Size>
 			<AbsDimension x="437" y="315" />
 		</Size>
